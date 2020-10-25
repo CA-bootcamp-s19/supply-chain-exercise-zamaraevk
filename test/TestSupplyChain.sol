@@ -5,13 +5,26 @@ import "truffle/DeployedAddresses.sol";
 import "../contracts/SupplyChain.sol";
 
 contract TestSupplyChain {
-
     // Test for failing conditions in this contracts:
     // https://truffleframework.com/tutorials/testing-for-throws-in-solidity-tests
+    SupplyChain public supplyChain;
+    uint256 public initialBalance;
+
+    function beforeEach() public {
+        supplyChain = new SupplyChain();
+        initialBalance = 999 ether;
+    }
 
     // buyItem
-
     // test for failure if user does not send enough funds
+    function notEnoughFunds() public returns (bool) {
+        supplyChain.addItem("Watch", 50);
+        bool r;
+        (r, ) = address(supplyChain).call{value: 10}(
+            abi.encodeWithSignature("buyItem(uint256)", 0)
+        );
+        Assert.isTrue(r, "not enough funds for purchase");
+    }
     // test for purchasing an item that is not for Sale
 
     // shipItem
@@ -23,5 +36,4 @@ contract TestSupplyChain {
 
     // test calling the function from an address that is not the buyer
     // test calling the function on an item not marked Shipped
-
 }
